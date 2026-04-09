@@ -109,26 +109,18 @@ static ObjString* allocateString(char* chars, int length) {
 */
 //> allocate-string
 //> Hash Tables allocate-string
-static ObjString* allocateString(char* chars, int length,
-                                 uint32_t hash) {
-//< Hash Tables allocate-string
-  ObjString* string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
+static ObjString* allocateString(const char* chars, int length, uint32_t hash) {
+  ObjString* string = (ObjString*)allocateObject(
+      sizeof(ObjString) + length + 1, OBJ_STRING);
   string->length = length;
-  string->chars = chars;
-//> Hash Tables allocate-store-hash
   string->hash = hash;
-//< Hash Tables allocate-store-hash
-//> Hash Tables allocate-store-string
-//> Garbage Collection push-string
+  memcpy(string->chars, chars, length);
+  string->chars[length] = '\0';
 
   push(OBJ_VAL(string));
-//< Garbage Collection push-string
   tableSet(&vm.strings, string, NIL_VAL);
-//> Garbage Collection pop-string
   pop();
 
-//< Garbage Collection pop-string
-//< Hash Tables allocate-store-string
   return string;
 }
 //< allocate-string
